@@ -1,4 +1,8 @@
+#ifndef task_H
+#define task_H
 #include "string.h"
+#include "stdlib.h"
+
 typedef struct Task
 {
     int hours;
@@ -7,3 +11,5 @@ typedef struct Task
     int info;
     struct Task * next;
 } task;
+
+#endif
