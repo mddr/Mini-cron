@@ -1,6 +1,10 @@
 #include "headers/task.h"
 
+<<<<<<< HEAD
 task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
+=======
+void Push(task* head, int hours, int minutes, char* command, int info)
+>>>>>>> fc95d86adeb3efc0edb82ccbe0452068ff00e569
 {
     task* tmp = (task*)malloc(sizeof(task));
     tmp->hours = hours;

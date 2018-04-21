@@ -9,6 +9,4 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-int GetFile(char*, int);
-
 #endif
