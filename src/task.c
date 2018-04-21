@@ -17,8 +17,8 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
     if(first == NULL)
     {
         AddToEmpty(first, hours, minutes, command, info);
-    } 
-    else 
+    }
+    else
     {
         task *tmp, *p;
         p = first;
@@ -44,7 +44,19 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
         tmp->info = info;
         tmp->next = p->next;
         p->next = tmp;
-
     }
     return first;
+}
+
+int SleepTime(task* task)
+{
+    double seconds;
+    time_t now;
+    struct tm* timeinfo;
+    time(&now);
+    timeinfo = localtime(&now);
+    timeinfo->tm_hour = task->hours;
+    timeinfo->tm_min = task->minutes;
+    seconds = difftime(mktime(timeinfo),now);
+    return ((int) seconds);
 }
