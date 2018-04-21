@@ -1,6 +1,7 @@
 #include "headers/read.h"
 #include "headers/log.h"
 #include "headers/task.h"
+#include "headers/print.h"
 
 int main(int argc, char* argv[]) 
 {
@@ -54,6 +55,6 @@ int main(int argc, char* argv[])
     // {
     //     sleep(3);
     // }
-
+    PrintUsage();
     exit(EXIT_SUCCESS);
 }

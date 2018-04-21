@@ -13,6 +13,7 @@ typedef struct Task
     struct Task * next;
 } task;
 
-void Push(task*, int, int, char*, int);
+task* AddToEmpty(task*, int, int, char*, int);
+task* Add(task*, int, int, char*, int);
 
 #endif
