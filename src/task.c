@@ -1,24 +1,50 @@
 #include "headers/task.h"
 
+<<<<<<< HEAD
+task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
+=======
 void Push(task* head, int hours, int minutes, char* command, int info)
+>>>>>>> fc95d86adeb3efc0edb82ccbe0452068ff00e569
 {
-    task * current = head;
-    while(current->next->hours < hours)
+    task* tmp = (task*)malloc(sizeof(task));
+    tmp->hours = hours;
+    tmp->minutes = minutes;
+    strcpy(tmp->command, command);
+    tmp->info = info;
+    first = tmp;
+    first->next = first;
+    return first;
+}
+
+task* Add(task* first, int hours, int minutes, char* command, int info)
+{
+    if(first == NULL)
     {
-        current = current->next;
+        AddToEmpty(first, hours, minutes, command, info);
     }
-    if(current->next->hours == hours)
+    task *tmp, *p;
+    p = first;
+    while(p->next->hours < hours)
     {
-        while(current->next->minutes < minutes)
+        if(p->next == first);
+            break;
+        p = p->next;
+    }
+    if(p->next->hours == hours)
+    {
+        while(p->next->minutes < minutes)
         {
-            current = current->next;
+            if(p->next == first);
+            break;
+            p = p->next;
         }
     }
-    task * tmp = current->next;
-    current->next = malloc(sizeof(task));
-    current->next->next = tmp;
-    current->next->hours = hours;
-    current->next->minutes = minutes;
-    strcpy(current->next->command, command);
-    current->next-> info = info;
+    tmp = (task*)malloc(sizeof(task));
+    tmp->hours = hours;
+    tmp->minutes = minutes;
+    strcpy(tmp->command, command);
+    tmp->info = info;
+    tmp->next = p->next;
+    p->next = tmp;
+    return first;
 }
