@@ -13,4 +13,6 @@ typedef struct Task
     struct Task * next;
 } task;
 
+void Push(task*, int, int, char*, int);
+
 #endif

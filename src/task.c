@@ -1,6 +1,6 @@
 #include "headers/task.h"
 
-void Push(task * head, int hours, int minutes, char* command, int info)
+void Push(task* head, int hours, int minutes, char* command, int info)
 {
     task * current = head;
     while(current->next->hours < hours)

@@ -1,5 +1,6 @@
 #include "headers/read.h"
 #include "headers/log.h"
+#include "headers/task.h"
 
 int main(int argc, char* argv[]) 
 {
@@ -29,8 +30,8 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    int taskfile = GetFile(argv[1], O_RDONLY);
-    int outfile = GetFile(argv[2], O_WRONLY);
+    int taskfile = open(argv[1], O_RDONLY);
+    int outfile = open(argv[2], O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 
     if (taskfile == -1) 
     {
@@ -42,7 +43,13 @@ int main(int argc, char* argv[])
         LogError(argv[0], "Invalid outfile.");
         exit(EXIT_FAILURE);
     }
-    
+
+    char buffer[1024];
+    int counter = read(taskfile, buffer, sizeof(buffer));
+    int i;
+    for (i=0;i<counter;++i)
+        printf("%c", buffer[i]);
+        
     // while(1)
     // {
     //     sleep(3);
