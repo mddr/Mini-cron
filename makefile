@@ -1,4 +1,4 @@
-obj = src/log.c src/main.c src/read.c src/tasks.c
+obj = src/log.c src/main.c src/read.c src/task.c
 
 build : $(obj)
-	gcc $(obj) -o build
+	gcc $(obj) -o build.o
