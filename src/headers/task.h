@@ -1,7 +1,8 @@
-#ifndef task_H
-#define task_H
+#ifndef TASK_H
+#define TASK_H
+
 #include "string.h"
-#include "stdlib.h"
+#include <stdlib.h>
 
 typedef struct Task
 {
