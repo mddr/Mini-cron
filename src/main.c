@@ -51,9 +51,7 @@ int main(int argc, char* argv[])
     char buffer[1024];
     read(taskfile, buffer, sizeof(buffer));
 
-    task* tasks = malloc(sizeof(task));
-    tasks->next = tasks;
-
+    task* tasks = NULL;
     int hours, minutes, info;
     char *command;
     char *delimeter = ":\n";
@@ -66,27 +64,27 @@ int main(int argc, char* argv[])
         command = strtok(NULL, delimeter);
         info = atoi(strtok(NULL, delimeter));
         line = strtok(NULL, delimeter);
-        if (tasks->next == tasks) 
+        /*if (tasks->next == tasks) 
         {
-            // tasks->hours = hours;
-            // tasks->minutes = minutes;
-            // strcpy(tasks->command, command);
-            // tasks->info = info;
-            tasks = AddToEmpty(tasks,hours,minutes,command,info);
-        } else {
-            // printf("%d %d %s %d\n", hours, minutes, command, info);
+             tasks->hours = hours;
+             tasks->minutes = minutes;
+             strcpy(tasks->command, command);
+             tasks->info = info;
+            //tasks = AddToEmpty(tasks,hours,minutes,command,info);
+        } else */
+        //{
+            //printf("%d %d %s %d\n", hours, minutes, command, info);
             tasks = Add(tasks, hours, minutes, command, info);
 
-        }
+        //}
         
     }
     // printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
-// int i;
-//     for(i = 0;i<2;i++) {
+     int i;
+     for(i = 0;i<7;i++) {
         printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
-        // tasks = tasks->next;
-    // }
-        printf("%d %d %s %d\n", tasks->next->hours, tasks->next->minutes, tasks->next->command, tasks->next->info);
+        tasks = tasks->next;
+     }
     
     // while(1)
     // {

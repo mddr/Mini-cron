@@ -3,7 +3,7 @@
 
 task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
 {    
-    task* tmp = (task*)malloc(sizeof(task));
+    task* tmp = malloc(sizeof(task));
     tmp->hours = hours;
     tmp->minutes = minutes;
     strcpy(tmp->command, command);
@@ -22,36 +22,42 @@ task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
 
 task* Add(task* first, int hours, int minutes, char* command, int info)
 {   
-    task *tmp, *p;
-    p = first;
-    
-    while(p->next->hours < hours)
+    if(first == NULL)
     {
-        if(p->next == first)
-            break;
-        p = p->next;
+        first = AddToEmpty(first, hours, minutes, command, info);
     }
-    
-    if(p->next->hours == hours)
+    else
     {
-        while(p->next->minutes < minutes)
+        task *tmp, *p;
+        p = first;
+        while(p->next->hours < hours)
         {
             if(p->next == first)
                 break;
             p = p->next;
         }
+        
+        if(p->next->hours == hours)
+        {
+            while(p->next->minutes < minutes)
+            {
+                if(p->next == first)
+                    break;
+                p = p->next;
+            }
 
-    }
-    
-    tmp = (task*)malloc(sizeof(task));
-    tmp->hours = hours;
-    tmp->minutes = minutes;
-    strcpy(tmp->command, command);
-    tmp->info = info;
-    tmp->next = p->next;
-    p->next = tmp;
-
-    
+        }
+        
+        tmp = (task*)malloc(sizeof(task));
+        tmp->hours = hours;
+        tmp->minutes = minutes;
+        strcpy(tmp->command, command);
+        tmp->info = info;
+        tmp->next = p->next;
+        p->next = tmp;
+        //if(p==first)
+        // first=tmp; 
+    }    
     return first;
 }
 
