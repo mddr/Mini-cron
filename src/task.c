@@ -40,6 +40,7 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
                 break;
             p = p->next;
         }
+
     }
     
     tmp = (task*)malloc(sizeof(task));
@@ -52,4 +53,17 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
 
     
     return first;
+}
+
+int SleepTime(task* task)
+{
+    double seconds;
+    time_t now;
+    struct tm* timeinfo;
+    time(&now);
+    timeinfo = localtime(&now);
+    timeinfo->tm_hour = task->hours;
+    timeinfo->tm_min = task->minutes;
+    seconds = difftime(mktime(timeinfo),now);
+    return ((int) seconds);
 }
