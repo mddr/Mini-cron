@@ -4,5 +4,6 @@
 #include <syslog.h>
 
 void LogError(char*, char*);
+void LogMessage(char*, char*);
 
 #endif
