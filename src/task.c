@@ -55,8 +55,6 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
         tmp->info = info;
         tmp->next = p->next;
         p->next = tmp;
-        //if(p==first)
-        // first=tmp; 
     }    
     return first;
 }
@@ -72,4 +70,32 @@ int SleepTime(task* task)
     timeinfo->tm_min = task->minutes;
     seconds = difftime(mktime(timeinfo),now);
     return ((int) seconds);
+}
+
+task* KindOfSort(task* first)
+{
+    task* tmp, *tmp2, *tmp3;
+    tmp = first;
+    tmp2 = first;
+    tmp3 = first;
+    while(tmp->next != first)
+    {
+        if((SleepTime(tmp->next)-SleepTime(first)) > 0 && (SleepTime(tmp)-SleepTime(first)) < 0)
+        {
+            if(tmp->hours < first->hours)
+            tmp2 = tmp;
+            tmp = tmp->next;
+            while(tmp3->next != first)
+            {
+                tmp3 = tmp3->next;
+            }
+            tmp3->next = first->next;
+            tmp2->next = first;
+            first->next = tmp;
+            break;
+        }
+    tmp = tmp->next;
+    }
+    return first;
+
 }
