@@ -8,6 +8,7 @@ int main(int argc, char* argv[])
     if(argc != 3) 
     {
         LogError(argv[0], "Invalid arguments.");
+        PrintUsage();
         exit(EXIT_FAILURE);
     }
         
@@ -37,24 +38,59 @@ int main(int argc, char* argv[])
     if (taskfile == -1) 
     {
         LogError(argv[0], "Invalid taskfile.");
+        PrintUsage();    
         exit(EXIT_FAILURE);
     }
     else if (outfile == -1) 
     {
         LogError(argv[0], "Invalid outfile.");
+        PrintUsage();
         exit(EXIT_FAILURE);
     }
 
     char buffer[1024];
-    int counter = read(taskfile, buffer, sizeof(buffer));
-    int i;
-    for (i=0;i<counter;++i)
-        printf("%c", buffer[i]);
+    read(taskfile, buffer, sizeof(buffer));
+
+    task* tasks = malloc(sizeof(task));
+    tasks->next = tasks;
+
+    int hours, minutes, info;
+    char *command;
+    char *delimeter = ":\n";
+    char *line = strtok(buffer, delimeter);
+
+    while (line != NULL)
+    {
+        hours = atoi(line);
+        minutes = atoi(strtok(NULL, delimeter));
+        command = strtok(NULL, delimeter);
+        info = atoi(strtok(NULL, delimeter));
+        line = strtok(NULL, delimeter);
+        if (tasks->next == tasks) 
+        {
+            // tasks->hours = hours;
+            // tasks->minutes = minutes;
+            // strcpy(tasks->command, command);
+            // tasks->info = info;
+            tasks = AddToEmpty(tasks,hours,minutes,command,info);
+        } else {
+            // printf("%d %d %s %d\n", hours, minutes, command, info);
+            tasks = Add(tasks, hours, minutes, command, info);
+
+        }
         
+    }
+    // printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
+// int i;
+//     for(i = 0;i<2;i++) {
+        printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
+        // tasks = tasks->next;
+    // }
+        printf("%d %d %s %d\n", tasks->next->hours, tasks->next->minutes, tasks->next->command, tasks->next->info);
+    
     // while(1)
     // {
     //     sleep(3);
     // }
-    PrintUsage();
     exit(EXIT_SUCCESS);
 }
