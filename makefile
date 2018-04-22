@@ -1,4 +1,4 @@
-obj = src/log.c src/main.c src/demonize.c src/task.c src/print.c
+obj = src/log.c src/main.c src/demonize.c src/task.c src/print.c src/signal.c
 taskTest = tests/taskTest.c src/task.c
 
 build : $(obj)
