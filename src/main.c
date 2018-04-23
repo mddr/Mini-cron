@@ -79,7 +79,13 @@ int main(int argc, char* argv[])
         //go to the next task
         tmp = tmp->next;
     }
-    
+    // printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
+     int i;
+     tasks = KindOfSort(tasks);
+     for(i = 0;i<10;i++) {
+        printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
+        tasks = tasks->next;
+     }
     
     // while(1)
     // {

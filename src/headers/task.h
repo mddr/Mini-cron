@@ -17,5 +17,6 @@ typedef struct Task
 task* AddToEmpty(task*, int, int, char*, int);
 task* Add(task*, int, int, char*, int);
 int SleepTime(task*);
+task* KindOfSort(task*);
 
 #endif
