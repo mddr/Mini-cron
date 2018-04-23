@@ -4,5 +4,6 @@
 #include <stdio.h>
 
 void PrintUsage();
+void PrintCommandWithArguments(char **);
 
 #endif

@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     Demonize(argv[0]);
 
     int taskfile = open(argv[1], O_RDONLY);
-    int outfile = open(argv[2], O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+    int outfile = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 
     if (taskfile == -1) 
     {
@@ -49,9 +49,10 @@ int main(int argc, char* argv[])
         tasks = Add(tasks, hours, minutes, command, info);
         
     }
-
+    tasks=KindOfSort(tasks);
     task* tmp = tasks;
-    while (tmp->next != tasks)
+    
+    do
     {
         // sleep(SleepTime(tmp));
 
@@ -59,10 +60,10 @@ int main(int argc, char* argv[])
         char *savePtr;
         char *commandName = strtok_r(tmp->command, " ", &savePtr);
 
-        //assumed maximum of 10 arguments, 64 chars each
+        //assumed maximum of 10 arguments, 64 chars each + NULL at the end
         char **arguments = malloc(10*sizeof(char*));
         int i;
-        for (i=0;i<10;i++)
+        for (i=0;i<11;i++)
             arguments[i] = malloc(64*sizeof(char));
         i=2;
         arguments[0] = commandName;
@@ -72,20 +73,30 @@ int main(int argc, char* argv[])
             arguments[i] = strtok(NULL, " ");
             i++;
         }
-        arguments[i] = NULL;
+        switch(tmp->info)
+        {
+            case 0:
+                dup2(outfile, STDOUT_FILENO);
+                PrintCommandWithArguments(arguments);
+                break;
+            case 1:
+                dup2(STDERR_FILENO, STDOUT_FILENO);
+                break;
+            case 2:
+                dup2(STDERR_FILENO, STDOUT_FILENO);
+                dup2(outfile, STDOUT_FILENO);
+                break;
+            default:
+                LogError(argv[0], "Invalid info provided.");
+                return -1;
+        }
 
+        arguments[i] = NULL;
         ExecuteCommand(argv[0], commandName, arguments);
 
         //go to the next task
         tmp = tmp->next;
-    }
-    // printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
-     int i;
-     tasks = KindOfSort(tasks);
-     for(i = 0;i<10;i++) {
-        printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
-        tasks = tasks->next;
-     }
+    } while (tmp != tasks);
     
     // while(1)
     // {

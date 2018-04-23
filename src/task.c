@@ -96,6 +96,7 @@ task* KindOfSort(task* first)
         }
     tmp = tmp->next;
     }
-    return first;
-
+    while (SleepTime(first->next)-SleepTime(first) > 0)
+        first = first->next;
+    return first->next;
 }
