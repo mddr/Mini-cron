@@ -1,7 +1,7 @@
-#include "headers/read.h"
 #include "headers/log.h"
 #include "headers/task.h"
 #include "headers/print.h"
+#include "headers/demonize.h"
 
 int main(int argc, char* argv[]) 
 {
@@ -12,25 +12,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
         
-    pid_t pid, sid;
-    pid = fork();
-    if (pid < 0)
-    {
-        LogError(argv[0], "Error forking a process.");   
-        exit(EXIT_FAILURE);
-    }
-    else if (pid > 0)
-    {
-        //child created
-        exit(EXIT_SUCCESS);
-    }
-
-    sid = setsid();
-    if(sid < 0)
-    {
-        LogError(argv[0], "Error creating new session.");
-        exit(EXIT_FAILURE);
-    }
+    Demonize(argv[0]);
 
     int taskfile = open(argv[1], O_RDONLY);
     int outfile = open(argv[2], O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -64,20 +46,38 @@ int main(int argc, char* argv[])
         command = strtok(NULL, delimeter);
         info = atoi(strtok(NULL, delimeter));
         line = strtok(NULL, delimeter);
-        /*if (tasks->next == tasks) 
-        {
-             tasks->hours = hours;
-             tasks->minutes = minutes;
-             strcpy(tasks->command, command);
-             tasks->info = info;
-            //tasks = AddToEmpty(tasks,hours,minutes,command,info);
-        } else */
-        //{
-            //printf("%d %d %s %d\n", hours, minutes, command, info);
-            tasks = Add(tasks, hours, minutes, command, info);
-
-        //}
+        tasks = Add(tasks, hours, minutes, command, info);
         
+    }
+
+    task* tmp = tasks;
+    while (tmp->next != tasks)
+    {
+        // sleep(SleepTime(tmp));
+
+        //split command and arguments
+        char *savePtr;
+        char *commandName = strtok_r(tmp->command, " ", &savePtr);
+
+        //assumed maximum of 10 arguments, 64 chars each
+        char **arguments = malloc(10*sizeof(char*));
+        int i;
+        for (i=0;i<10;i++)
+            arguments[i] = malloc(64*sizeof(char));
+        i=2;
+        arguments[0] = commandName;
+        arguments[1] = strtok(savePtr, " ");
+        while (i < 10 && arguments[i-1] != NULL)
+        {
+            arguments[i] = strtok(NULL, " ");
+            i++;
+        }
+        arguments[i] = NULL;
+
+        ExecuteCommand(argv[0], commandName, arguments);
+
+        //go to the next task
+        tmp = tmp->next;
     }
     // printf("%d %d %s %d\n", tasks->hours, tasks->minutes, tasks->command, tasks->info);
      int i;
