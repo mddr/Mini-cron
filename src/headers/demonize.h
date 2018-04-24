@@ -11,7 +11,6 @@
 #include <fcntl.h>
 
 void Demonize();
-void RunPipedCommand(char* programName, char* pipedCommand, int info, int outfile);
-void ExecuteCommand(char* programName, char* command, int info, int outfile);
+void ExecuteCommand(char* programName, char* command, int info, int outfile, int isLastFlag);
 
 #endif

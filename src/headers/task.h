@@ -7,7 +7,7 @@
 
 typedef struct Task
 {
-    int hours;
+    int hour;
     int minutes;
     char command[500];
     int info;

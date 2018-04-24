@@ -56,11 +56,27 @@ int main(int argc, char* argv[])
     {
         // sleep(SleepTime(tmp));
 
-        //check if there are pipes
-        char *savePtr;
-        char *c1 = strtok_r(tmp->command, "|", &savePtr);
+        int i;
+        char **commands = malloc(10*sizeof(char*));
+        for(i=0;i<10;i++)
+            commands[i] = malloc(64*sizeof(char));
 
-        if (strlen(savePtr) == 0)   //no pipes
+        int isPipe = 0;
+        //check if there are pipes
+        commands[0] = strtok_r(tmp->command, "|", &commands[1]);
+        i = 2;
+        if (strlen(commands[1]) != 0) {
+            strtok(commands[1], "|");
+            isPipe = 1;
+        }
+        while (i < 10 && strlen(&command[i-1]) != 0)
+        {
+            commands[i] = strtok(NULL, "|");
+            i++;
+        }
+
+
+        if (!isPipe)   //no pipes
         {
             pid_t pid = fork();
             if (pid < 0)
@@ -70,7 +86,7 @@ int main(int argc, char* argv[])
             }
             else if (pid == 0)
             {
-                ExecuteCommand(argv[0], c1, tmp->info, outfile);
+                ExecuteCommand(argv[0], tmp->command, tmp->info, outfile, 1);
             } 
         }
         else
@@ -78,8 +94,8 @@ int main(int argc, char* argv[])
             int fd[2];
             int fd_in = 0;
             pid_t childpid;
-            
-            while (strlen(savePtr) != 0)
+            i = 0;
+            while (commands[i] != NULL)
             {
                 pipe(fd);
                 childpid = fork();
@@ -91,9 +107,12 @@ int main(int argc, char* argv[])
                 else if (childpid == 0)
                 {
                     dup2(fd_in, 0);
-
                     close(fd[0]);
-                    ExecuteCommand(argv[0], c1, tmp->info, outfile); //execute command
+                    if (commands[i+1] != NULL) {
+                        dup2(fd[1], 1);
+                        ExecuteCommand(argv[0], commands[i], tmp->info, outfile, 0); //execute command
+                    } else                    
+                        ExecuteCommand(argv[0], commands[i], tmp->info, outfile, 1); //execute command
                     exit(EXIT_FAILURE);
                 }
                 else
@@ -101,7 +120,7 @@ int main(int argc, char* argv[])
                     wait(NULL);
                     close(fd[1]);
                     fd_in = fd[0];
-                    c1 = strtok_r(NULL, "|", &savePtr);
+                    i++;
                 }
 
             }

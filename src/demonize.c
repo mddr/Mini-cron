@@ -25,12 +25,7 @@ void Demonize(char* programName)
     }
 }
 
-void RunPipedCommand(char* programName, char* pipedCommand, int info, int outfile)
-{
-
-}
-
-void ExecuteCommand(char* programName, char* command, int info, int outfile)
+void ExecuteCommand(char* programName, char* command, int info, int outfile, int isLastFlag)
 {
 
     //split command and arguments
@@ -53,22 +48,24 @@ void ExecuteCommand(char* programName, char* command, int info, int outfile)
 
     arguments[i] = NULL;
 
-    //set correct output
-    switch(info)
+    if(isLastFlag) 
     {
-        case 0:
-            printf(" ");
-            dup2(outfile, STDOUT_FILENO);
-            break;
-        case 1:
-            printf(" ");
-            dup2(STDERR_FILENO, STDOUT_FILENO);
-            break;
-        case 2:
-            break;
-        default:
-            LogError(programName, "Invalid info provided.");
-            return;
+        switch(info)
+        {
+            case 0:
+                printf(" ");
+                dup2(outfile, STDOUT_FILENO);
+                break;
+            case 1:
+                printf(" ");
+                dup2(STDERR_FILENO, STDOUT_FILENO);
+                break;
+            case 2:
+                break;
+            default:
+                LogError(programName, "Invalid info provided.");
+                return;
+        }
     }
     PrintCommandWithArguments(arguments);
     LogMessage(programName, "Executing command.");
