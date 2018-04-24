@@ -2,18 +2,37 @@
 #include "headers/task.h"
 #include "headers/print.h"
 #include "headers/demonize.h"
+#include "headers/signal.h"
+#include <signal.h>
+#include <unistd.h>
+
+char* infile;
+char* ofile;
+task* tasks;
+task* tmp;
+
+void clear()
+{
+    while(getchar() != '\n');
+}
+
 
 int main(int argc, char* argv[]) 
-{
+{   
+    signal(SIGUSR1, SIGUSR1Signal);
+    signal(SIGUSR2, SIGUSR2Signal);
+    signal(SIGINT, SIGINTSignal);
+    
     if(argc != 3) 
     {
         LogError(argv[0], "Invalid arguments.");
         PrintUsage();
         exit(EXIT_FAILURE);
     }
-        
-    Demonize(argv[0]);
 
+    Demonize(argv[0]);
+    infile = argv[1];
+    ofile = argv[2];
     int taskfile = open(argv[1], O_RDONLY);
     int outfile = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 
@@ -33,7 +52,7 @@ int main(int argc, char* argv[])
     char buffer[1024];
     read(taskfile, buffer, sizeof(buffer));
 
-    task* tasks = NULL;
+    tasks = NULL;
     int hours, minutes, info;
     char *command;
     char *delimeter = ":\n";
@@ -48,9 +67,10 @@ int main(int argc, char* argv[])
         line = strtok(NULL, delimeter);
         tasks = Add(tasks, hours, minutes, command, info);
         
-    }
+    }  
+    
     tasks=KindOfSort(tasks);
-    task* tmp = tasks;
+    tmp = tasks;
     
     while(1)
     {

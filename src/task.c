@@ -95,3 +95,17 @@ task* KindOfSort(task* first)
         first = first->next;
     return first->next;
 }
+
+task* DeleteList(task* first)
+{
+    task* current = first;
+    task* next;
+    while(current->next != first)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    first = NULL;
+    return first;
+}
