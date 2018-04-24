@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
         
-    Demonize(argv[0]);
+    // Demonize(argv[0]);
 
     int taskfile = open(argv[1], O_RDONLY);
     int outfile = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -56,44 +56,56 @@ int main(int argc, char* argv[])
     {
         // sleep(SleepTime(tmp));
 
-        //split command and arguments
+        //check if there are pipes
         char *savePtr;
-        char *commandName = strtok_r(tmp->command, " ", &savePtr);
+        char *c1 = strtok_r(tmp->command, "|", &savePtr);
 
-        //assumed maximum of 10 arguments, 64 chars each + NULL at the end
-        char **arguments = malloc(10*sizeof(char*));
-        int i;
-        for (i=0;i<11;i++)
-            arguments[i] = malloc(64*sizeof(char));
-        i=2;
-        arguments[0] = commandName;
-        arguments[1] = strtok(savePtr, " ");
-        while (i < 10 && arguments[i-1] != NULL)
+        if (strlen(savePtr) == 0)   //no pipes
         {
-            arguments[i] = strtok(NULL, " ");
-            i++;
+            pid_t pid = fork();
+            if (pid < 0)
+            {
+                LogError(argv[0], "Error forking a process.");   
+                exit(EXIT_FAILURE);
+            }
+            else if (pid == 0)
+            {
+                ExecuteCommand(argv[0], c1, tmp->info, outfile);
+            } 
         }
-        switch(tmp->info)
+        else
         {
-            case 0:
-                dup2(outfile, STDOUT_FILENO);
-                PrintCommandWithArguments(arguments);
-                break;
-            case 1:
-                dup2(STDERR_FILENO, STDOUT_FILENO);
-                break;
-            case 2:
-                dup2(STDERR_FILENO, STDOUT_FILENO);
-                dup2(outfile, STDOUT_FILENO);
-                break;
-            default:
-                LogError(argv[0], "Invalid info provided.");
-                return -1;
+            int fd[2];
+            int fd_in = 0;
+            pid_t childpid;
+            
+            while (strlen(savePtr) != 0)
+            {
+                pipe(fd);
+                childpid = fork();
+                if (childpid < 0)
+                {
+                    LogError(argv[0], "Error forking a process.");   
+                    exit(EXIT_FAILURE);
+                }
+                else if (childpid == 0)
+                {
+                    dup2(fd_in, 0);
+
+                    close(fd[0]);
+                    ExecuteCommand(argv[0], c1, tmp->info, outfile); //execute command
+                    exit(EXIT_FAILURE);
+                }
+                else
+                {
+                    wait(NULL);
+                    close(fd[1]);
+                    fd_in = fd[0];
+                    c1 = strtok_r(NULL, "|", &savePtr);
+                }
+
+            }
         }
-
-        arguments[i] = NULL;
-        ExecuteCommand(argv[0], commandName, arguments);
-
         //go to the next task
         tmp = tmp->next;
     } while (tmp != tasks);

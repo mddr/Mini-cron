@@ -10,12 +10,6 @@ task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
     tmp->info = info;
     first = tmp;
     first->next = first;
-    // first = (task*)malloc(sizeof(task));
-    // first->hours = hours;
-    // first->minutes = minutes;
-    // strcpy(first->command, command);
-    // first->info = info;
-    // first->next = first;
 
     return first;
 }

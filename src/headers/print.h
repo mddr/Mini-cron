@@ -2,8 +2,9 @@
 #define PRINT_H
 
 #include <stdio.h>
+#include <unistd.h>
 
 void PrintUsage();
-void PrintCommandWithArguments(char **);
+void PrintCommandWithArguments(char ** arguments);
 
 #endif
