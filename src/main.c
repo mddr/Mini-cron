@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
         
-    // Demonize(argv[0]);
+    Demonize(argv[0]);
 
     int taskfile = open(argv[1], O_RDONLY);
     int outfile = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
     
     do
     {
+        // LogMessage(argv[0], "Daemon goes to sleep");
         // sleep(SleepTime(tmp));
 
         int i;
@@ -93,6 +94,7 @@ int main(int argc, char* argv[])
         {
             int fd[2];
             int fd_in = 0;
+            int isLast = 0;
             pid_t childpid;
             i = 0;
             while (commands[i] != NULL)
@@ -110,14 +112,15 @@ int main(int argc, char* argv[])
                     close(fd[0]);
                     if (commands[i+1] != NULL) {
                         dup2(fd[1], 1);
-                        ExecuteCommand(argv[0], commands[i], tmp->info, outfile, 0); //execute command
-                    } else                    
-                        ExecuteCommand(argv[0], commands[i], tmp->info, outfile, 1); //execute command
+                        isLast = 0;
+                    } else 
+                        isLast = 1;
+                    ExecuteCommand(argv[0], commands[i], tmp->info, outfile, isLast);
                     exit(EXIT_FAILURE);
                 }
                 else
                 {
-                    wait(NULL);
+                    int status;
                     close(fd[1]);
                     fd_in = fd[0];
                     i++;

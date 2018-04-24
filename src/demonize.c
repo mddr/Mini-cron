@@ -66,9 +66,9 @@ void ExecuteCommand(char* programName, char* command, int info, int outfile, int
                 LogError(programName, "Invalid info provided.");
                 return;
         }
+        PrintCommandWithArguments(arguments);
+        LogMessage(programName, "Executing command.");
     }
-    PrintCommandWithArguments(arguments);
-    LogMessage(programName, "Executing command.");
     execvp(commandName, arguments);
     exit(EXIT_FAILURE);
 }

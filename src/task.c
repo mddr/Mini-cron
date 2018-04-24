@@ -62,6 +62,7 @@ int SleepTime(task* task)
     timeinfo = localtime(&now);
     timeinfo->tm_hour = task->hour;
     timeinfo->tm_min = task->minutes;
+    timeinfo->tm_sec = 0;
     seconds = difftime(mktime(timeinfo),now);
     return ((int) seconds);
 }
