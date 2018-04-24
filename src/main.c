@@ -52,10 +52,10 @@ int main(int argc, char* argv[])
     tasks=KindOfSort(tasks);
     task* tmp = tasks;
     
-    do
+    while(1)
     {
-        // LogMessage(argv[0], "Daemon goes to sleep");
-        // sleep(SleepTime(tmp));
+        LogMessage(argv[0], "Daemon goes to sleep");
+        sleep(SleepTime(tmp));
 
         int i;
         char **commands = malloc(10*sizeof(char*));
@@ -113,15 +113,22 @@ int main(int argc, char* argv[])
                     if (commands[i+1] != NULL) {
                         dup2(fd[1], 1);
                         isLast = 0;
-                    } else 
+                    } else {
                         isLast = 1;
+                    }
                     ExecuteCommand(argv[0], commands[i], tmp->info, outfile, isLast);
                     exit(EXIT_FAILURE);
                 }
                 else
-                {
+                {  
                     int status;
+                    wait(&status);
                     close(fd[1]);
+                    
+                    char snum[32];
+                    sprintf(snum, "%d", status);
+                    strcat(snum, " - process exit code.");
+                    LogMessage(argv[0],snum);
                     fd_in = fd[0];
                     i++;
                 }
@@ -130,11 +137,6 @@ int main(int argc, char* argv[])
         }
         //go to the next task
         tmp = tmp->next;
-    } while (tmp != tasks);
-    
-    // while(1)
-    // {
-    //     sleep(3);
-    // }
+    }
     exit(EXIT_SUCCESS);
 }
