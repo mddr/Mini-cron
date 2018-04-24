@@ -1,43 +1,37 @@
 #include "headers/task.h"
 #include <stdio.h>
 
-task* AddToEmpty(task* first, int hours, int minutes, char* command, int info)
+task* AddToEmpty(task* first, int hour, int minutes, char* command, int info)
 {    
     task* tmp = malloc(sizeof(task));
-    tmp->hours = hours;
+    tmp->hour = hour;
     tmp->minutes = minutes;
     strcpy(tmp->command, command);
     tmp->info = info;
     first = tmp;
     first->next = first;
-    // first = (task*)malloc(sizeof(task));
-    // first->hours = hours;
-    // first->minutes = minutes;
-    // strcpy(first->command, command);
-    // first->info = info;
-    // first->next = first;
 
     return first;
 }
 
-task* Add(task* first, int hours, int minutes, char* command, int info)
+task* Add(task* first, int hour, int minutes, char* command, int info)
 {   
     if(first == NULL)
     {
-        first = AddToEmpty(first, hours, minutes, command, info);
+        first = AddToEmpty(first, hour, minutes, command, info);
     }
     else
     {
         task *tmp, *p;
         p = first;
-        while(p->next->hours < hours)
+        while(p->next->hour < hour)
         {
             if(p->next == first)
                 break;
             p = p->next;
         }
         
-        if(p->next->hours == hours)
+        if(p->next->hour == hour)
         {
             while(p->next->minutes < minutes)
             {
@@ -49,7 +43,7 @@ task* Add(task* first, int hours, int minutes, char* command, int info)
         }
         
         tmp = (task*)malloc(sizeof(task));
-        tmp->hours = hours;
+        tmp->hour = hour;
         tmp->minutes = minutes;
         strcpy(tmp->command, command);
         tmp->info = info;
@@ -66,8 +60,9 @@ int SleepTime(task* task)
     struct tm* timeinfo;
     time(&now);
     timeinfo = localtime(&now);
-    timeinfo->tm_hour = task->hours;
+    timeinfo->tm_hour = task->hour;
     timeinfo->tm_min = task->minutes;
+    timeinfo->tm_sec = 0;
     seconds = difftime(mktime(timeinfo),now);
     return ((int) seconds);
 }
@@ -82,7 +77,7 @@ task* KindOfSort(task* first)
     {
         if((SleepTime(tmp->next)-SleepTime(first)) > 0 && (SleepTime(tmp)-SleepTime(first)) < 0)
         {
-            if(tmp->hours < first->hours)
+            if(tmp->hour < first->hour)
             tmp2 = tmp;
             tmp = tmp->next;
             while(tmp3->next != first)

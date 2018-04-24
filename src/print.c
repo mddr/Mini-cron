@@ -20,5 +20,5 @@ void PrintCommandWithArguments(char **arguments)
         printf(" %s", arguments[i]);
         i++;
     }
-    printf(":\n");
+    printf(": \n");
 }

@@ -72,58 +72,91 @@ int main(int argc, char* argv[])
     tasks=KindOfSort(tasks);
     tmp = tasks;
     
-    do
+    while(1)
     {
-        // printf("\nfdsfs\n");
-        
+        LogMessage(argv[0], "Daemon goes to sleep");
         sleep(SleepTime(tmp));
-        // printf("\nfdsfs\n");
-        
-        //split command and arguments
-        char *savePtr;
-        char *commandName = strtok_r(tmp->command, " ", &savePtr);
 
-        //assumed maximum of 10 arguments, 64 chars each + NULL at the end
-        char **arguments = malloc(10*sizeof(char*));
         int i;
-        for (i=0;i<11;i++)
-            arguments[i] = malloc(64*sizeof(char));
-        i=2;
-        arguments[0] = commandName;
-        arguments[1] = strtok(savePtr, " ");
-        while (i < 10 && arguments[i-1] != NULL)
+        char **commands = malloc(10*sizeof(char*));
+        for(i=0;i<10;i++)
+            commands[i] = malloc(64*sizeof(char));
+
+        int isPipe = 0;
+        //check if there are pipes
+        commands[0] = strtok_r(tmp->command, "|", &commands[1]);
+        i = 2;
+        if (strlen(commands[1]) != 0) {
+            strtok(commands[1], "|");
+            isPipe = 1;
+        }
+        while (i < 10 && strlen(&command[i-1]) != 0)
         {
-            arguments[i] = strtok(NULL, " ");
+            commands[i] = strtok(NULL, "|");
             i++;
         }
-        switch(tmp->info)
+
+
+        if (!isPipe)   //no pipes
         {
-            case 0:
-                dup2(outfile, STDOUT_FILENO);
-                PrintCommandWithArguments(arguments);
-                break;
-            case 1:
-                dup2(STDERR_FILENO, STDOUT_FILENO);
-                break;
-            case 2:
-                dup2(STDERR_FILENO, STDOUT_FILENO);
-                dup2(outfile, STDOUT_FILENO);
-                break;
-            default:
-                LogError(argv[0], "Invalid info provided.");
-                return -1;
+            pid_t pid = fork();
+            if (pid < 0)
+            {
+                LogError(argv[0], "Error forking a process.");   
+                exit(EXIT_FAILURE);
+            }
+            else if (pid == 0)
+            {
+                ExecuteCommand(argv[0], tmp->command, tmp->info, outfile, 1);
+            } 
         }
+        else
+        {
+            int fd[2];
+            int fd_in = 0;
+            int isLast = 0;
+            pid_t childpid;
+            i = 0;
+            while (commands[i] != NULL)
+            {
+                pipe(fd);
+                childpid = fork();
+                if (childpid < 0)
+                {
+                    LogError(argv[0], "Error forking a process.");   
+                    exit(EXIT_FAILURE);
+                }
+                else if (childpid == 0)
+                {
+                    dup2(fd_in, 0);
+                    close(fd[0]);
+                    if (commands[i+1] != NULL) {
+                        dup2(fd[1], 1);
+                        isLast = 0;
+                    } else {
+                        isLast = 1;
+                    }
+                    ExecuteCommand(argv[0], commands[i], tmp->info, outfile, isLast);
+                    exit(EXIT_FAILURE);
+                }
+                else
+                {  
+                    int status;
+                    wait(&status);
+                    close(fd[1]);
+                    
+                    char snum[32];
+                    sprintf(snum, "%d", status);
+                    strcat(snum, " - process exit code.");
+                    LogMessage(argv[0],snum);
+                    fd_in = fd[0];
+                    i++;
+                }
 
-        arguments[i] = NULL;
-        ExecuteCommand(argv[0], commandName, arguments);
-
+            }
+        }
         //go to the next task
         tmp = tmp->next;
-    } while (tmp != tasks);
-    
-    // while(1)
-    // {
-    //     sleep(3);
-    // }
+    }
     exit(EXIT_SUCCESS);
 }
