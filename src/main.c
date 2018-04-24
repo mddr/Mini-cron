@@ -69,13 +69,21 @@ int main(int argc, char* argv[])
         
     }  
     
-    tasks=KindOfSort(tasks);
+    tasks = KindOfSort(tasks);
     tmp = tasks;
     
     while(1)
     {
+        int seconds = SleepTime(tmp);
+        while (seconds < 0) {
+            tmp = tmp->next;
+            if (tmp == tasks)
+                break;
+        }
+        if (seconds < 0)
+            seconds += 86400;   //add 24h
         LogMessage(argv[0], "Daemon goes to sleep");
-        sleep(SleepTime(tmp));
+        sleep(seconds);
 
         int i;
         char **commands = malloc(10*sizeof(char*));
@@ -157,6 +165,7 @@ int main(int argc, char* argv[])
         }
         //go to the next task
         tmp = tmp->next;
-    }
+    } 
+    
     exit(EXIT_SUCCESS);
 }
