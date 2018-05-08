@@ -26,11 +26,17 @@ void SIGUSR2Signal(int sig)
 {
     if(sig == SIGUSR2)
     {
-        while(tmp->next != tasks)
+        task *old = tmp;
+        while(old != tasks)
         {
-            LogMessage("./minicron.o", tmp->command);
-            tmp = tmp->next;
+            LogMessage("./minicron.o", old->command);
+            old = old->next;
         }
+        
+        int seconds = SleepTime(tmp);
+        if (seconds < 0)
+            seconds += 86400;
+        sleep(SleepTime(tmp));
     }
 }
 

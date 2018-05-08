@@ -73,15 +73,22 @@ int main(int argc, char* argv[])
     tmp = tasks;
     
     while(1)
+    // do
     {
         int seconds = SleepTime(tmp);
-        while (seconds < 0) {
+
+        while (seconds < 0) 
+        {
             tmp = tmp->next;
+            seconds = SleepTime(tmp);
             if (tmp == tasks)
+            {
+                seconds += 86400;
                 break;
+            }
         }
-        if (seconds < 0)
-            seconds += 86400;   //add 24h
+
+        printf("%d\n", seconds);
         LogMessage(argv[0], "Daemon goes to sleep");
         sleep(seconds);
 
@@ -164,6 +171,7 @@ int main(int argc, char* argv[])
             }
         }
         //go to the next task
+        sleep(1);
         tmp = tmp->next;
     } 
     
